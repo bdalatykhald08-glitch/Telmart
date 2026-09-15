@@ -1,0 +1,22 @@
+GET  http://127.0.0.1:8000/accounts/ 
+Authorization: 
+
+###
+POST http://127.0.0.1:8000/accounts/
+
+###
+GET http://127.0.0.1:8000/phones/
+Authorization: 
+###
+POST http://127.0.0.1:8000/phones/
+
+###
+GET http://127.0.0.1:8000/specses/
+
+
+###
+GET http://127.0.0.1:8000/vouchers/
+Authorization: 
+###
+
+POST http://127.0.0.1:8000/vouchers/
