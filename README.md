@@ -1,7 +1,7 @@
 <-- TelMart -->
 <div align="center">
 
-# 🛒 TelMart Backend System
+# 📱 TelMart Backend System
 
 <p>
   <b>An asynchronous e-commerce for mobile on Sudan backend architecture powered by Django, Celery, and Docker.</b>
