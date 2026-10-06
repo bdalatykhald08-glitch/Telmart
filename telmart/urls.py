@@ -26,7 +26,7 @@ from drf_spectacular.views import (
 )
 from django.urls import path, include
 
-#from telmart import settings
+from telmart import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,10 +36,12 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger_ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('', include('Telephone.urls')),
-    path('silk/', include('silk.urls', namespace='silk')),
+  
 ]
 
-#if settings.DEBUG:  import debug_toolbar urlpatterns = [     path('__debug__/', include(debug_toolbar.urls)),
-    #] + urlpatterns
+if settings.DEBUG:
+    urlpatterns = [  
+       path('silk/', include('silk.urls', namespace='silk')),
+    ] + urlpatterns
 
 
