@@ -161,9 +161,9 @@ MAILERS = {
     },
 }
 
-if DEBUG:
-    INSTALLED_APPS += ['silk']
-    MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
+#if DEBUG:
+   # INSTALLED_APPS += ['silk']
+  #  MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
 
 REST_FRAMEWORK = {
 
@@ -175,7 +175,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2,
+    'PAGE_SIZE': 10,
 
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/day',
@@ -183,25 +183,20 @@ REST_FRAMEWORK = {
     }
 }
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
+#SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+#SESSION_CACHE_ALIAS = "default"
 
 
-CACHES = {
-   "default": {
-      "BACKEND":
-       "django.core.cache.backends.redis.RedisCache",
-       "LOCATION": "redis://127.0.0.1:6379/1",
-   }
-}
+#CACHES = { "default":
+#  {  "BACKEND":   "django.core.cache.backends.redis.RedisCache",   "LOCATION": "redis://127.0.0.1:6379/1",  }}
 
 
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+#CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0') 
+# CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+#CELERY_TIMEZONE = 'UTC'
 
 SPECTAULAR_SETTINGS = {
     'TITLE': 'Telmart API',
@@ -221,18 +216,11 @@ SPECTAULAR_SETTINGS = {
 #INTERNAL_IPS = ['127.0.0.1',]
 
 
-TESTING = 'test' in sys.argv
+#TESTING = 'test' in sys.argv
 
-if TESTING:
-    CELERY_TASK_ALWAYS_EAGER = True
-    CELERY_TASK_EAGER_PROPAGATES = True
+#if TESTING: CELERY_TASK_ALWAYS_EAGER = True  CELERY_TASK_EAGER_PROPAGATES = True
 
-    CACHES = {
-      "default": {
-        "BACKEND": 
-           "django.core.cache.backends.locmem.LocMemCache",
-        }
-    }
+  #  CACHES = {  "default": {    "BACKEND":        "django.core.cache.backends.locmem.LocMemCache",    } }
 
 
 
