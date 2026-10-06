@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar',
  #   'debug_toolbar',
-    'silk',
+    
   
 ]
 
@@ -62,7 +62,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'silk.middleware.SilkyMiddleware',
    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
