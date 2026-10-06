@@ -1,13 +1,23 @@
 from django.db import models, transaction
 from django.conf import settings
 from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
-from django.utils import timezone
-from datetime import timedelta
-
-
+from django.db.models import Count, Sum, F, Q, ExpressionWrapper, DecimalField, Value
+from decimal import Decimal
+from django.db.models.functions import Coalesce
 
 # Create your models here.
+class AccountQueryset(models.QuerySet):
+    def with_financial_annotations(self):
+        return self.select_related('user').annotate(
+            total_phones=Count('phones'),
+            total_value=Coalesce(Sum('phones__amount'), Value(0), output_field=DecimalField()),
+            new_phones_count=Count('phones', filter=Q(phones__phone_status='new')),
+            discounted_total=Sum(
+                ExpressionWrapper(
+                   F('phones__amount') * Decimal('0.8'),
+                     output_field=DecimalField())
+                )
+            ).order_by('id')
 
 
 class Account(models.Model):
@@ -18,22 +28,17 @@ class Account(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_verified = models.BooleanField(default=False)
-
-    def __str__(self):
-
-        user_obj = getattr(self, 'user', None)
-        return user_obj.username  if user_obj else f"Account {self.number}"
-
+    objects = AccountQueryset.as_manager()
     
+    def __str__(self):
+        return f"{self.user}"
     class Meta:
 
         ordering = ['-created_at']
         
 
-
 # function timezone for class Phone 
-def one_day_hence():
-    return timezone.now() + timedelta(days=1)
+
 
 class Phone(models.Model):
 
@@ -52,15 +57,11 @@ class Phone(models.Model):
     phone_status = models.CharField(max_length=50, choices=PHONE_STATUS, help_text='حالة الجهاز')
     amount = models.DecimalField(max_digits=12, decimal_places=2, help_text='المبلغ بالجنيه السوداني')
     created_at = models.DateTimeField(auto_now_add=True)
-    add_time = models.DateTimeField(default=one_day_hence)
+
 
     def __str__(self):
 
-        return self.type_phone
-
-    @property
-    def is_add_limit(self):
-        return timezone.now() < self.add_time
+        return self.holder
     
     class Meta:
 
@@ -80,11 +81,7 @@ class Specs(models.Model):
     
     def __str__(self):
 
-        phone_obj = getattr(self, 'phone')
-        if phone_obj:
-            return f"{phone_obj.type_phone} - {self.processor}"
-        
-        return f"Specs - {self.processor}"
+        return f"{self.phone}"
         
     class Meta:
 
@@ -108,10 +105,10 @@ class Voucher(models.Model):
     number_IMEI = models.CharField(max_length=15, unique=True, validators=[RegexValidator(r'^\d{15}$', 'الأرقام الصحيحة تتكون من 15 رقم')])
     buyer_confirmed = models.BooleanField(default=False)
     seller_confirmed = models.BooleanField(default=False)
-    contract = models.BooleanField(default=False)
+    contract = models.BooleanField(default=True)
     payment_url = models.URLField(blank=True, null=True, help_text='طريقة الدفع عن طريق محفظة ألكترونية مثل ماي كاشي')
     transfer_id = models.CharField(max_length=25, blank=True, null=True, help_text='أرقام العملية لتحويلة ')
-    payment_status = models.CharField(max_length=45, choices=PAYMENT_STATUS, default='PENDING')
+    payment_status = models.CharField(max_length=45, choices=PAYMENT_STATUS)
     pdf = models.FileField(help_text='PDF الحصول علي ألايصال بصيغة', null=True, blank=True)
 
 
@@ -121,21 +118,6 @@ class Voucher(models.Model):
     class Meta:
 
         ordering = ['-date']
-
-    @transaction.atomic
-    def confirm_and_release(self):
-
-        if self.payment_status != 'PAID_HELD':
-            raise ValidationError("لايمكن تحرير المبلغ قبل أتمام الدفغ وحجزه لدي المنصة")
-
-        if not (self.buyer_confirmed and self.seller_confirmed):
-            raise ValidationError("IMEI يجب موافقة الطرفين ومطابقة رقم")
-
-        self.payment_status = 'COMPELTED'
-        self.contract =True
-
-        self.save()
-
 
     @property
     def type_phone(self):

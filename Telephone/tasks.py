@@ -1,50 +1,25 @@
-from celery import shared_task
-from django.core.exceptions import ObjectDoesNotExist
-import time
 import logging
+from django.db import transaction
+from .models import  Voucher
+from celery import shared_task
+from django.contrib.auth import get_user_model
 
-
-from .models import Account
-
-
-@shared_task
-def send_welcome_email(account_id):
-    time.sleep(3)
-
-    try:
-
-       acccount = Account.objects.get(id=account_id)
-       acccount.is_verified = True
-       acccount.save()
-       
-       print(f"{acccount.number}: تم توثيق الحساب بنجاح")
-       return True
-
-    except Account.DoesNotExist:
-        print(f"رقم الحساب {account_id} غير موجود!")
-        return False
+User = get_user_model()
 
 logger = logging.getLogger(__name__)
 
+
 @shared_task
-def process_voucher_status(voucher_id, payment_status):
+def process_voucher_status(payment_status):
 
-    from .models import Voucher
-
-    try:
-        voucher = Voucher.objects.get(id=voucher_id)
-
+    with transaction.atomic():
+        voucher = Voucher.objects.select_for_update()
         voucher.payment_status = payment_status
-        voucher.save()
+        voucher.save(update_fields=['payment_status'])
 
-        logger.info(f"Voucher {voucher_id} updated to status: {payment_status}")
-        return f"Voucher {voucher_id} updated successfully"
-
-    except Voucher.DoesNotExist:
-        logger.error(f"Voucher with ID {voucher_id} was not found.")
-        return False
- 
+        logger.info(f"Voucher updated to status: {payment_status}")
+        return f"Voucher {payment_status} updated successfully"
 
 
     
-    
+

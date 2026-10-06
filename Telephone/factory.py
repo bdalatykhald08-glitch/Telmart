@@ -3,12 +3,10 @@ from faker import Faker
 from .models import *
 import random
 from django.contrib.auth import get_user_model
-
+from django.core.files.uploadedfile import SimpleUploadedFile
 User = get_user_model()
 
-
 fake = Faker()
-
 
 class UserFactory(factory.django.DjangoModelFactory):
 
@@ -24,9 +22,8 @@ class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Account
 
-    user = factory.SubFactory(UserFactory)
-    number = factory.Sequence(lambda n: f"{n+1:010d}")
-    image = factory.django.ImageField()
+    number = factory.Sequence(lambda n: f"{1000000 + n}")
+    image = factory.LazyFunction(lambda: SimpleUploadedFile(name='test.jpg', content=b'fake-image-content'))
     is_verified = factory.Faker('boolean')
 
     
@@ -35,7 +32,7 @@ class PhoneFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Phone
        
-    account = factory.SubFactory(AccountFactory)
+  
     holder = factory.Faker('random_element', elements=['store', 'person'])
     name_store = factory.Faker('random_element', elements=['techPo', 'HamzaPhone', 'KTell', 'phoneStad', 'yesatech', 'markmob'])
     type_phone = factory.Faker('sentence', nb_words=3)
@@ -48,7 +45,7 @@ class SpecsFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Specs
         
-    phone = factory.SubFactory(PhoneFactory)
+  
     processor = factory.LazyFunction(lambda: f"معالج {random.randint(1, 9999)}")
     memory = factory.LazyFunction(lambda: f"{random.choice([32, 64, 128, 256, 512])} جيجا")
     ram = factory.LazyFunction(lambda: f"{random.choice([4, 8, 12, 16, 24])} جيجا")
@@ -61,10 +58,7 @@ class VoucherFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Voucher
 
-    specs = factory.SubFactory(SpecsFactory)
-    buyer = factory.SubFactory(UserFactory)
-    seller = factory.SubFactory(UserFactory)
-    number_IMEI = factory.Sequence(lambda n: f"{n+1:015d}")
+    number_IMEI = factory.Sequence(lambda n: str(50000 + n))
     buyer_confirmed = factory.Faker('boolean')
     seller_confirmed = factory.Faker('boolean')
     contract = factory.Faker('boolean')
