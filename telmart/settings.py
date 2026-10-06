@@ -162,6 +162,9 @@ MAILERS = {
     },
 }
 
+if DEBUG:
+    INSTALLED_APPS += ['silk']
+    MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
 
 REST_FRAMEWORK = {
 
