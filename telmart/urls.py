@@ -26,7 +26,7 @@ from drf_spectacular.views import (
 )
 from django.urls import path, include
 
-from telmart import settings
+#from telmart import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,9 +39,7 @@ urlpatterns = [
   
 ]
 
-if settings.DEBUG:
-    urlpatterns = [  
-       path('silk/', include('silk.urls', namespace='silk')),
-    ] + urlpatterns
+#if settings.DEBUG:  urlpatterns = [    path('silk/', include('silk.urls', namespace='silk')),
+   # ] + urlpatterns
 
 

@@ -13,12 +13,12 @@ cssselect2==0.9.0
 dj-database-url==3.1.2
 Django==6.1
 django-cors-headers==4.9.0
-django-debug-toolbar==8.0.0
+#django-debug-toolbar==8.0.0
 django-extensions==4.1
 django-filter==26.1
 django-rest-framework==0.1.0
 django-seed==0.3.1
-django-silk==5.5.2
+#django-silk==5.5.2
 django-weasyprint==2.5.0
 djangorestframework==3.18.0
 djangorestframework_simplejwt==5.5.1
@@ -75,3 +75,4 @@ weasyprint==69.0
 webencodings==0.6.1
 whitenoise==6.12.0
 zopfli==0.4.3
+
