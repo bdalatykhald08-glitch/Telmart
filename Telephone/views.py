@@ -22,7 +22,7 @@ def mobile_view(request):
 class AccountViewSet(viewsets.ModelViewSet):
      
     serializer_class = AccountSerializer
-    permission_classes = [IsAuthenticated]
+  #  permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['number']
 
@@ -43,7 +43,7 @@ class PhoneViewSet(viewsets.ModelViewSet):
 
     queryset = Phone.objects.select_related('account').order_by('id')
     serializer_class = PhoneSerializer
-    permission_classes = [IsAuthenticated] 
+ #  permission_classes = [IsAuthenticated] 
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['type_phone', 'amount']
 
@@ -55,7 +55,7 @@ class SpecsViewSet(viewsets.ModelViewSet):
 
     queryset = Specs.objects.select_related('phone').order_by('id')
     serializer_class = SpecsSerializer
-    permission_classes = [IsAuthenticated]
+  #  permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['memory']
     search_fields = ['ram']
@@ -68,7 +68,7 @@ class VoucherViewSet(viewsets.ModelViewSet):
 
     queryset = Voucher.objects.select_related('specs', 'buyer', 'seller').order_by('id')
     serializer_class = VoucherSerializer
-    permission_classes = [IsAuthenticated]
+  #  permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['number_IMEI']
 
