@@ -23,11 +23,11 @@ class AccountQueryset(models.QuerySet):
 class Account(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    number = models.CharField(max_length=10, unique=True, validators=[RegexValidator(r'^\d{10}', 'أدخل رقم الجوال بدون المفتاح ')])
-    image = models.ImageField(upload_to='image/')
+    number = models.CharField(max_length=10, blank=True, null=True, validators=[RegexValidator(r'^\d{10}', 'أدخل رقم الجوال بدون المفتاح ')])
+    image = models.ImageField(upload_to='image/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_verified = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=True)
     objects = AccountQueryset.as_manager()
     
     def __str__(self):

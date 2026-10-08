@@ -10,15 +10,15 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def process_voucher_status(payment_status):
+def process_voucher_status(voucher_id, payment_status):
 
     with transaction.atomic():
-        voucher = Voucher.objects.select_for_update()
+        voucher = Voucher.objects.select_for_update().get(id=voucher_id)
         voucher.payment_status = payment_status
         voucher.save(update_fields=['payment_status'])
 
-        logger.info(f"Voucher updated to status: {payment_status}")
-        return f"Voucher {payment_status} updated successfully"
+        logger.info(f"Voucher {voucher_id} updated to status: {payment_status}")
+        return f"Voucher {voucher_id} {payment_status} updated successfully"
 
 
     

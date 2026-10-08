@@ -77,7 +77,7 @@ ROOT_URLCONF = 'telmart.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR / 'templates')],
+        'DIRS': [os.path.join(BASE_DIR / 'template')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,7 +97,7 @@ WSGI_APPLICATION = 'telmart.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL')
+        default=os.getenv('DATABASE_URL', 'postgresql://mpook:Otay22@localhost:5432/telmart_db')
      
     )
 }
@@ -141,8 +141,20 @@ FAKER_LOCALE = "ar_AA"
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
-   os.path.join(BASE_DIR, 'Telephone/static'),]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+   os.path.join(BASE_DIR, 'Telephone/static'),
+   ]
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
+}
+
+WHITENOISE_MAINFEST_STRICT = False
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -183,20 +195,20 @@ REST_FRAMEWORK = {
     }
 }
 
-#SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-#SESSION_CACHE_ALIAS = "default"
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 
-#CACHES = { "default":
-#  {  "BACKEND":   "django.core.cache.backends.redis.RedisCache",   "LOCATION": "redis://127.0.0.1:6379/1",  }}
+CACHES = { "default":
+  {  "BACKEND":   "django.core.cache.backends.redis.RedisCache",   "LOCATION": "redis://127.0.0.1:6379/1",  }}
 
 
-#CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0') 
-# CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-#CELERY_TIMEZONE = 'UTC'
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0') 
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
 
 SPECTAULAR_SETTINGS = {
     'TITLE': 'Telmart API',
@@ -213,14 +225,16 @@ SPECTAULAR_SETTINGS = {
     }
 }
 
-#INTERNAL_IPS = ['127.0.0.1',]
+INTERNAL_IPS = ['127.0.0.1',]
 
 
-#TESTING = 'test' in sys.argv
+TESTING = 'test' in sys.argv
 
-#if TESTING: CELERY_TASK_ALWAYS_EAGER = True  CELERY_TASK_EAGER_PROPAGATES = True
+if TESTING: 
+        CELERY_TASK_ALWAYS_EAGER = True 
+        CELERY_TASK_EAGER_PROPAGATES = True
 
-  #  CACHES = {  "default": {    "BACKEND":        "django.core.cache.backends.locmem.LocMemCache",    } }
+CACHES = {  "default": {    "BACKEND":        "django.core.cache.backends.locmem.LocMemCache",    } }
 
 
 

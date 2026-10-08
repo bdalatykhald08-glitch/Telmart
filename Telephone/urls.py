@@ -1,5 +1,5 @@
 
-from .views import AccountViewSet, PhoneViewSet, SpecsViewSet, VoucherViewSet
+from .views import AccountViewSet, PhoneViewSet, SpecsViewSet, VoucherViewSet, RegisterViewSet
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from .views import mobile_view
@@ -15,8 +15,9 @@ router.register(r'vouchers', VoucherViewSet, basename='voucher'),
 
 urlpatterns = [
     # html page
+    path('mobile/', mobile_view, name='mobile'),
+    path('api/register/', RegisterViewSet.as_view(), name='register'),
     path('', include(router.urls)),
-    path('mobile', mobile_view, name='mobile'),
 ]
 
 

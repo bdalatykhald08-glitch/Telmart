@@ -42,15 +42,15 @@ class VoucherEscrowService:
     def confirm_and_release(self, value):
         # الشرط  لاحقا عندما أتواصل مع بوابة دفع لعملية حجز المال 
 
-        #if self.payment_status != 'PAID_HELD':
-           # raise ValidationError("لايمكن تحرير المبلغ قبل أتمام الدفغ وحجزه لدي المنصة")
+        if self.payment_status != 'PAID_HELD':
+            raise ValidationError("لايمكن تحرير المبلغ قبل أتمام الدفغ وحجزه لدي المنصة")
     
         if self.buyer_confirmed and self.seller_confirmed == False:
             raise ValidationError(" يجب موافقة الطرفين ")
 
         else:
     
-         #   self.payment_status = 'COMPLETED'
+            self.payment_status = 'COMPLETED'
             self.contract = True
             self.save()
 

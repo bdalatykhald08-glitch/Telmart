@@ -5,10 +5,32 @@ from datetime import timedelta
 from .services import PhoneValidationService
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-
+from django.db import models, transaction
 User = get_user_model()
 
+class RegisterSerializer(serializers.ModelSerializer):
 
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+    number = serializers.CharField(max_length=10, required=False, allow_null=True,  allow_blank=True)
+    image = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'number', 'image']
+
+    def create(self, validated_data):
+        number = validated_data.pop('number', None)
+        image = validated_data.pop('image', None)
+
+        is_verified = bool(number and image)
+
+        with transaction.atomic():
+            user = User.objects.create_user(**validated_data)
+
+            Account.objects.create(user=user, number=number, image=image, is_verified=is_verified)
+
+        return user
+    
 class AccountSerializer(serializers.ModelSerializer):
 
     total_phones = serializers.IntegerField(read_only=True)
@@ -32,7 +54,7 @@ class PhoneSerializer(serializers.ModelSerializer):
         model = Phone
         fields = ['id', 'account', 'holder', 'name_store', 'type_phone',
         'phone_status', 'amount', 'created_at']
-        read_only_fields = ['account', 'created_at']
+        read_only_fields = ['created_at']
     
     #المحاولة تعود بعد يوم 24 ساعة شرط شامل لهما
 class SpecsSerializer(serializers.ModelSerializer):
@@ -51,7 +73,8 @@ class VoucherSerializer(serializers.ModelSerializer):
         fields = ['id', 'specs', 'date', 'buyer', 'seller', 'buyer_confirmed', 'seller_confirmed',
         'contract', 'number_IMEI', 'payment_url', 'transfer_id', 'payment_status', 'pdf']
 
-        read_only_fields = ['date', 'buyer', 'seller', 'buyer_confirmed', 'seller_confirmed', 'contract']
+        read_only_fields = ['date', 'buyer', 'seller', 
+                            'buyer_confirmed', 'seller_confirmed', 'payment_status', 'contract']
 
 
 
