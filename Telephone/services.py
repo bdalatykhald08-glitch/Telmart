@@ -7,6 +7,17 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+class AccountValidationService:
+    @staticmethod
+    def validate(self, attrs):
+        number = attrs.get('number')
+        image = attrs.get('image')
+    
+        if (number and not image) or (image and not number):
+            raise ValidationError("لايمكن توثيق الحساب ألا بكتابة الرقم ورفع الصورة لملف الشخصي")
+    
+        return attrs
+
 
 class PhoneValidationService:
 
@@ -18,8 +29,8 @@ class PhoneValidationService:
         if holder == 'store' and not  name_store:
            raise ValidationError("عندما يكون الأختيار محل يجب عليك وضع أسمه")
         
-        elif holder == 'person':
-           raise ValidationError("أكتب أسمك")
+        if holder == 'person':
+           attrs['name_store'] = None
     
         account = getattr(request.user, 'account', None)
         if account:

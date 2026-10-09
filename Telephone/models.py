@@ -22,16 +22,27 @@ class AccountQueryset(models.QuerySet):
 
 class Account(models.Model):
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='user')
     number = models.CharField(max_length=10, blank=True, null=True, validators=[RegexValidator(r'^\d{10}', 'أدخل رقم الجوال بدون المفتاح ')])
     image = models.ImageField(upload_to='image/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_verified = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
     objects = AccountQueryset.as_manager()
+
+    def save(self, *args, **kwargs):
+
+        if self.number and self.image:
+            self.is_verified = True
+
+        else:
+            self.is_verified = False
+        super().save(*args, **kwargs)
+
     
     def __str__(self):
         return f"{self.user}"
+    
     class Meta:
 
         ordering = ['-created_at']
@@ -61,7 +72,7 @@ class Phone(models.Model):
 
     def __str__(self):
 
-        return self.holder
+        return self.type_phone
     
     class Meta:
 
@@ -71,7 +82,7 @@ class Phone(models.Model):
 class Specs(models.Model):
 
 
-    phone = models.ForeignKey(Phone, on_delete=models.CASCADE, related_name='specss')
+    phone_specs = models.OneToOneField(Phone, on_delete=models.CASCADE, related_name='phone_specs')
     processor = models.CharField(max_length=50, verbose_name='المعالج')
     memory = models.CharField(max_length=50, verbose_name='ذاكرة')
     ram = models.CharField(max_length=50, verbose_name='رام')
@@ -81,7 +92,7 @@ class Specs(models.Model):
     
     def __str__(self):
 
-        return f"{self.phone}"
+        return f"{self.phone_specs}"
         
     class Meta:
 
@@ -98,7 +109,7 @@ class Voucher(models.Model):
        ('FAILED', 'فشلت العملية'),
     ]
     
-    specs = models.ForeignKey(Specs, on_delete=models.CASCADE, related_name='vouchers')
+    phone_voucher = models.ForeignKey(Phone, on_delete=models.CASCADE, related_name='voucher')
     date = models.DateTimeField(auto_now_add=True)
     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='buyers')
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='sellers')
@@ -121,12 +132,12 @@ class Voucher(models.Model):
 
     @property
     def type_phone(self):
-        return self.specs.phone.type_phone
+        return self.phone.type_phone
 
 
     @property
     def amount(self):
-        return self.specs.phone.amount
+        return self.phone.amount
 
 
 

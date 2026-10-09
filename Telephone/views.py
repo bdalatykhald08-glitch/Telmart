@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Account, Phone, Specs, Voucher
-from .serializers import AccountSerializer, PhoneSerializer, SpecsSerializer, VoucherSerializer, RegisterSerializer
+from .serializers import AccountSerializer, PhoneSerializer,  VoucherSerializer, RegisterSerializer
 from django.contrib.auth import get_user_model
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -31,7 +31,7 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
 
     # clean function for save user
     def get_queryset(self):
-        return Account.objects.with_financial_annotations()
+        return Account.objects.filter(user=self.request.user).with_financial_annotations()
     
 
     @method_decorator(cache_page(60))
@@ -41,24 +41,17 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
         
 class PhoneViewSet(viewsets.ModelViewSet):
 
-    queryset = Phone.objects.select_related('account').order_by('id')
+    queryset = Phone.objects.select_related('account')
     serializer_class = PhoneSerializer
     permission_classes = [IsAuthenticated] 
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['type_phone', 'amount']
+    filterset_fields = ['type_phone', 'amount', 'phone_status', 'holder']
+    search_fields = ['type_phone', 'name_store']
 
+    
     def perform_create(self, serializer):
         serializer.save(account=self.request.user.account)
 
-
-class SpecsViewSet(viewsets.ModelViewSet):
-
-    queryset = Specs.objects.select_related('phone').order_by('id')
-    serializer_class = SpecsSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['memory']
-    search_fields = ['ram']
 
 
 class VoucherViewSet(viewsets.ModelViewSet):
@@ -70,15 +63,15 @@ class VoucherViewSet(viewsets.ModelViewSet):
 
 
     def get_queryset(self):
-        return Voucher.objects.select_related('specs', 'buyer', 'seller').filter(
+        return Voucher.objects.select_related('phone_voucher__account', 'buyer', 'seller').filter(
             Q(buyer=self.request.user) | Q(seller=self.request.user)
-        ).order_by('id')
+        )
 
     
     def perform_create(self, serializer):
         buyer = self.request.user
-
-        seller = serializer.validated_data['specs'].phone.account.user
+        phone = serializer.validated_data['phone']
+        seller = phone.account.user
 
         if buyer  == seller:
             raise ValidationError("لايمكن أن يكون البائع والمشتري نفس الشخص")

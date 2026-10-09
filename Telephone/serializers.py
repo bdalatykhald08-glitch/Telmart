@@ -27,7 +27,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             user = User.objects.create_user(**validated_data)
 
-            Account.objects.create(user=user, number=number, image=image, is_verified=is_verified)
+            Account.objects.update_or_create(user=user, number=number, image=image, is_verified=is_verified)
 
         return user
     
@@ -47,31 +47,43 @@ class AccountSerializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'created_at', 'updated_at', 'is_verified']
 
 
-class PhoneSerializer(serializers.ModelSerializer):
-
-    class Meta:
-
-        model = Phone
-        fields = ['id', 'account', 'holder', 'name_store', 'type_phone',
-        'phone_status', 'amount', 'created_at']
-        read_only_fields = ['created_at']
-    
-    #المحاولة تعود بعد يوم 24 ساعة شرط شامل لهما
 class SpecsSerializer(serializers.ModelSerializer):
 
     class Meta:
 
         model = Specs
-        fields = ['id', 'phone', 'processor', 'memory', 'ram', 'battery', 'camera']
-      
+        fields = ['id', 'processor', 'memory', 'ram', 'battery', 'camera']
 
-class VoucherSerializer(serializers.ModelSerializer):
+      
+class PhoneSerializer(serializers.ModelSerializer):
+
+    phone_specs = SpecsSerializer()
 
     class Meta:
 
+        model = Phone
+        fields = ['id', 'account', 'holder', 'name_store', 'type_phone',
+        'phone_status', 'amount', 'phone_specs', 'created_at']
+        read_only_fields = ['account', 'created_at']
+
+    def create(self, validated_data):
+        specs_data = validated_data.pop('phone_specs')
+
+        phone = Phone.objects.create(**validated_data)
+
+        Specs.objects.create(phone_specs=phone, **specs_data)
+
+        return phone
+    
+    #المحاولة تعود بعد يوم 24 ساعة شرط شامل لهما
+
+class VoucherSerializer(serializers.ModelSerializer):
+    phone_details = PhoneSerializer(source='phone_voucher', read_only=True)
+    class Meta:
+
         model = Voucher
-        fields = ['id', 'specs', 'date', 'buyer', 'seller', 'buyer_confirmed', 'seller_confirmed',
-        'contract', 'number_IMEI', 'payment_url', 'transfer_id', 'payment_status', 'pdf']
+        fields = ['id', 'phone_voucher', 'date', 'buyer', 'seller', 'buyer_confirmed', 'seller_confirmed',
+        'contract', 'number_IMEI', 'phone_details', 'payment_url', 'transfer_id', 'payment_status', 'pdf']
 
         read_only_fields = ['date', 'buyer', 'seller', 
                             'buyer_confirmed', 'seller_confirmed', 'payment_status', 'contract']
