@@ -1,4 +1,4 @@
-from django.db import models, transaction
+from django.db import models
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db.models import Count, Sum, F, Q, ExpressionWrapper, DecimalField, Value
@@ -67,6 +67,7 @@ class Phone(models.Model):
     type_phone = models.CharField(max_length=50, help_text='smasung s22 نوع الجهاز باسمه مثل')
     phone_status = models.CharField(max_length=50, choices=PHONE_STATUS, help_text='حالة الجهاز')
     amount = models.DecimalField(max_digits=12, decimal_places=2, help_text='المبلغ بالجنيه السوداني')
+    image_phone = models.ImageField(upload_to='image/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -130,14 +131,6 @@ class Voucher(models.Model):
 
         ordering = ['-date']
 
-    @property
-    def type_phone(self):
-        return self.phone.type_phone
-
-
-    @property
-    def amount(self):
-        return self.phone.amount
 
 
 

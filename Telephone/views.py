@@ -3,14 +3,14 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Account, Phone, Specs, Voucher
+from .models import Account, Phone,  Voucher
 from .serializers import AccountSerializer, PhoneSerializer,  VoucherSerializer, RegisterSerializer
 from django.contrib.auth import get_user_model
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework.generics import CreateAPIView
 from django.core.exceptions import ValidationError
-from django.db.models import Count, Sum, F, Q
+from django.db.models import  Q
 User = get_user_model()
 
  
@@ -70,7 +70,7 @@ class VoucherViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         buyer = self.request.user
-        phone = serializer.validated_data['phone']
+        phone = serializer.validated_data['phone_voucher']
         seller = phone.account.user
 
         if buyer  == seller:

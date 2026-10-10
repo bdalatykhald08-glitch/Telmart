@@ -38,6 +38,7 @@ class PhoneFactory(factory.django.DjangoModelFactory):
     type_phone = factory.Faker('sentence', nb_words=3)
     phone_status = factory.Faker('random_element', elements=['new', 'used'])
     amount = factory.Faker('pydecimal', right_digits=2, left_digits=6, positive=True)
+    image_phone = factory.LazyFunction(lambda: SimpleUploadedFile(name='test2.jpg', content=b'fake-image-content'))
 
 
 class SpecsFactory(factory.django.DjangoModelFactory):

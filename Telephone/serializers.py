@@ -1,11 +1,7 @@
 from rest_framework import serializers
 from .models import Account, Phone, Specs,Voucher
-from django.utils import timezone
-from datetime import timedelta
-from .services import PhoneValidationService
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.db import models, transaction
+from django.db import transaction
 User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -63,7 +59,7 @@ class PhoneSerializer(serializers.ModelSerializer):
 
         model = Phone
         fields = ['id', 'account', 'holder', 'name_store', 'type_phone',
-        'phone_status', 'amount', 'phone_specs', 'created_at']
+        'phone_status', 'amount', 'phone_specs', 'image_phone', 'created_at']
         read_only_fields = ['account', 'created_at']
 
     def create(self, validated_data):
